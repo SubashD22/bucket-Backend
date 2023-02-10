@@ -13,10 +13,14 @@ mongoose.connect(db, { useNewUrlParser: true, useUnifiedTopology: true })
         console.log("OH NO ERROR!!!!")
         console.log(err)
     })
+const port = process.env.PORT || 5000
 const app = express();
 app.use(cors())
 app.use(express.json());
 app.use(express.urlencoded({extended: false}));
+app.get('/',(req,res)=>{
+    res.send('hello')
+})
 app.post('/api/signIn', async(req,res)=>{
     const {token} = req.body;
     const decodeToken = await admin.auth().verifyIdToken(token);
@@ -74,10 +78,7 @@ app.put('/api/updatelist',async(req,res)=>{
     }
    
 })
-app.listen(5000,()=>{
-    try {
-     console.log('listening') 
-    } catch (error) {
-        console.log(error)
-    }
+
+app.listen(port, () => {
+    console.log(`App listening at http://localhost:${port}`);
 });
