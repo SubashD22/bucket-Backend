@@ -4,8 +4,8 @@
   "description": "auth-app-bachend",
   "main": "index.js",
   "scripts": {
-    "server": "nodemon index.js",
-    "start": "index.js"
+    "start": "nodemon index.js"
+    
   },
   "author": "Subash",
   "license": "ISC",
