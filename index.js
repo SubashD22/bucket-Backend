@@ -23,6 +23,7 @@ app.get('/',(req,res)=>{
 })
 app.post('/api/signIn', async(req,res)=>{
     const {token} = req.body;
+    console.log(token)
     const decodeToken = await admin.auth().verifyIdToken(token);
     if(decodeToken){
         try {
@@ -30,14 +31,14 @@ app.post('/api/signIn', async(req,res)=>{
         if(!existingUser){
             const newUser = await userModel.create({
                 uid:decodeToken.uid,
-                userProvider:decodeToken.firebase.sign_in_provider
+                userProvider:decodeToken.firebase.sign_in_provider,
+                list:[]
             });
             res.status(200).json(newUser)
         };
         res.status(200).json(existingUser)  
         } catch (error) {
-          console.log(error) ;
-          res.status(500) 
+          res.status(500).send(error.message) 
         }
     }
   
@@ -48,18 +49,25 @@ const protect = async (req,res,next)=>{
         try{
             token = req.headers.authorization.split(' ')[1];
             const decodeToken = await admin.auth().verifyIdToken(token);
-            req.user = await userModel.findOne({uid:decodeToken.uid})
-            console.log(req.user)
+            const user = await userModel.findOne({uid:decodeToken.uid});
+            if(user){
+              req.user = user
+            }else if (!user){
+                const newUser = await userModel.create({
+                    uid:decodeToken.uid,
+                    userProvider:decodeToken.firebase.sign_in_provider,
+                    list:[]
+                });
+                req.user = newUser
+            }
+            
             next()
         }catch(err){
-            console.log(err)
-            res.status(401);
-            throw new Error("not authorised")
+            res.status(401).send(err.message)
         }
     }
     if(!token){
-        res.status(401);
-        throw new Error("not authorised,no token")
+        res.status(401).send("not authorised,no token");
     }
 };
 app.use(protect);
@@ -68,6 +76,7 @@ app.get('/api/getlist',async(req,res)=>{
 })
 app.put('/api/updatelist',async(req,res)=>{
     const{list}=req.body;
+    console.log(list)
     try {
         const updatedList = await userModel.findOneAndUpdate({uid:req.user.uid},{
             list:list
