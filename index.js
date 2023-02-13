@@ -18,7 +18,7 @@ const app = express();
 app.use(express.json());
 app.use(express.urlencoded({extended: false}));
 app.use(cors({
-    origin:["http://localhost:3000"]
+    origin:["http://localhost:3000","https://bucket-ebon.vercel.app"]
 }))
 app.get('/',(req,res)=>{
     res.send('hello')
@@ -77,7 +77,6 @@ app.get('/api/getlist',async(req,res)=>{
 })
 app.put('/api/updatelist',async(req,res)=>{
     const{list}=req.body;
-    console.log(list)
     try {
         const updatedList = await userModel.findOneAndUpdate({uid:req.user.uid},{
             list:list
