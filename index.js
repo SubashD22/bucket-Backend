@@ -17,13 +17,14 @@ const port = process.env.PORT || 5000
 const app = express();
 app.use(express.json());
 app.use(express.urlencoded({extended: false}));
-app.use(cors())
+app.use(cors({
+    origin:["http://localhost:3000"]
+}))
 app.get('/',(req,res)=>{
     res.send('hello')
 })
 app.post('/api/signIn', async(req,res)=>{
     const {token} = req.body;
-    console.log(token)
     const decodeToken = await admin.auth().verifyIdToken(token);
     if(decodeToken){
         try {
